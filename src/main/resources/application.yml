@@ -7,9 +7,11 @@ test:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 7355608
     url: jdbc:mysql://127.0.0.1:3306/wikidev?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
     username: root
+    password: 7355608
+
+
 
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
