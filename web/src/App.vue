@@ -2,7 +2,7 @@
   <a-layout id="components-layout-demo-top-side-2">
    <TheHeader></TheHeader>
     <router-view/>
-   <TheFooterer></TheFooterer>
+   <TheFooter></TheFooter>
   </a-layout>
 </template>
 
@@ -15,7 +15,7 @@
     name: 'app',
     components:{
       TheHeader,
-      TheFooter
+      TheFooter,
     },
   });
 </script>
