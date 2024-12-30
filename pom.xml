@@ -43,6 +43,13 @@
 			<version>1.2.70</version>
 		</dependency>
 
+		<!-- 集成PageHelper 插件-->
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
 		<!-- 集成mybatis-->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>

@@ -1,5 +1,6 @@
 package com.niko.wiki.service;
 
+import com.github.pagehelper.PageHelper;
 import com.niko.wiki.domain.Ebook;
 import com.niko.wiki.domain.EbookExample;
 import com.niko.wiki.mapper.EbookMapper;
@@ -27,6 +28,7 @@ public class EbookService {
         if(!ObjectUtils.isEmpty(req.getName())){
             criteria.andNameLike( "%" + req.getName() + "%");
         }
+        PageHelper.startPage(req.getPage(), req.getSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
 //        List<EbookResp> respList = new ArrayList<>();
