@@ -11,18 +11,20 @@
           :loading="loading"
           @change="handleTableChange"
       >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar" />
-        </template>
-        <template v-slot:action="{ text, record }">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
-              编辑
-            </a-button>
-            <a-button type="danger">
-              删除
-            </a-button>
-          </a-space>
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'cover'">
+            <img v-if="record.cover" :src="record.cover" alt="avatar"/>
+          </template>
+          <template v-if="column.key === 'action'">
+            <a-space size="small">
+              <a-button type="primary" @click="edit(record)">
+                编辑
+              </a-button>
+              <a-button type="danger">
+                删除
+              </a-button>
+            </a-space>
+          </template>
         </template>
       </a-table>
     </a-layout-content>
@@ -47,7 +49,6 @@ export default defineComponent({
       {
         title: '封面',
         dataIndex: 'cover',
-        slots: {customRender: 'cover'}
       },
       {
         title: '名称',
@@ -55,7 +56,7 @@ export default defineComponent({
       },
       {
         title: '分类',
-        slots: {customRender: 'category'}
+        dataIndex: 'category'
       },
       {
         title: '文档数',
@@ -72,7 +73,6 @@ export default defineComponent({
       {
         title: 'Action',
         key: 'action',
-        slots: {customRender: 'action'}
       }
     ];
 
@@ -82,13 +82,19 @@ export default defineComponent({
     const handleQuery = (params: any) => {
       loading.value = true;
 
-      axios.get("/ebook/list", params).then((response) => {
+      axios.get("/ebook/list", {
+        params:{
+          page:params.page,
+          size:params.size
+        }
+      }).then((response) => {
         loading.value = false
         const data = response.data;
-        ebooks.value = data.content;
+        ebooks.value = data.content.list;
 
           // 重置分页按钮
           pagination.value.current = params.page;
+          pagination.value.total = data.content.total;
       });
     };
 
@@ -104,7 +110,10 @@ export default defineComponent({
     };
 
     onMounted(() =>{
-      handleQuery({});
+      handleQuery({
+        page:1,
+        size:pagination.value.pageSize
+      });
     });
 
     return {
