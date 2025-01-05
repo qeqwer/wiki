@@ -1,16 +1,18 @@
 package com.niko.wiki.controller;
 
 
-import com.niko.wiki.req.EbookReq;
+import com.niko.wiki.req.EbookQueryReq;
+import com.niko.wiki.req.EbookSaveReq;
 import com.niko.wiki.resp.CommonResp;
-import com.niko.wiki.resp.EbookResp;
+import com.niko.wiki.resp.EbookQueryResp;
 import com.niko.wiki.resp.PageResp;
 import com.niko.wiki.service.EbookService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @RestController
 public class EbookController {
@@ -19,10 +21,17 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/ebook/list")
-    public CommonResp list(EbookReq req){
-        CommonResp<PageResp<EbookResp>> resp = new CommonResp<>();
-        PageResp<EbookResp> list = ebookService.list(req);
+    public CommonResp list(EbookQueryReq req){
+        CommonResp<PageResp<EbookQueryResp>> resp = new CommonResp<>();
+        PageResp<EbookQueryResp> list = ebookService.list(req);
         resp.setContent(list);
         return resp;
     }
+    @PostMapping("/ebook/save")
+    public CommonResp save(@RequestBody EbookSaveReq req) {
+        CommonResp resp = new CommonResp<>();
+        ebookService.save(req);
+        return resp;
+    }
+
 }

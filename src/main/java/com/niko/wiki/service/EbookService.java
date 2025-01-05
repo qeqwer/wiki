@@ -5,18 +5,17 @@ import com.github.pagehelper.PageInfo;
 import com.niko.wiki.domain.Ebook;
 import com.niko.wiki.domain.EbookExample;
 import com.niko.wiki.mapper.EbookMapper;
-import com.niko.wiki.req.EbookReq;
-import com.niko.wiki.resp.EbookResp;
+import com.niko.wiki.req.EbookQueryReq;
+import com.niko.wiki.req.EbookSaveReq;
+import com.niko.wiki.resp.EbookQueryResp;
 import com.niko.wiki.resp.PageResp;
 import com.niko.wiki.utils.CopyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,7 +27,7 @@ public class EbookService {
     @Resource
     private EbookMapper ebookMapper;
 
-    public PageResp<EbookResp> list(EbookReq req){
+    public PageResp<EbookQueryResp> list(EbookQueryReq req){
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         if(!ObjectUtils.isEmpty(req.getName())){
@@ -47,10 +46,25 @@ public class EbookService {
 //            BeanUtils.copyProperties(ebook, ebookResp);
 //            respList.add(ebookResp);
 //        }
-        List<EbookResp> list = CopyUtil.copyList(ebookList,EbookResp.class);
-        PageResp<EbookResp> pageResp = new PageResp();
+        List<EbookQueryResp> list = CopyUtil.copyList(ebookList, EbookQueryResp.class);
+        PageResp<EbookQueryResp> pageResp = new PageResp();
         pageResp.setList(list);
         pageResp.setTotal(pageInfo.getTotal());
         return pageResp;
      }
+
+    /**
+     * 保存
+     */
+    public void save(EbookSaveReq req) {
+        Ebook ebook = CopyUtil.copy(req, Ebook.class);
+        if (ObjectUtils.isEmpty(req.getId())) {
+            // 新增
+//            ebook.setId(snowFlake.nextId());
+            ebookMapper.insert(ebook);
+        } else {
+            // 更新
+            ebookMapper.updateByPrimaryKey(ebook);
+        }
+    }
 }

@@ -32,7 +32,7 @@
 
   <a-modal
       title="电子书表单"
-      v-model:visible="modalVisible"
+      v-model:open="modalVisible"
       :confirm-loading="modalLoading"
       @ok="handleModalOk"
   >
@@ -43,8 +43,11 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name" />
       </a-form-item>
-      <a-form-item label="分类">
-        <a-input v-model:value="ebook.category1_id" />
+      <a-form-item label="分类1">
+        <a-input v-model:value="ebook.category1Id" />
+      </a-form-item>
+      <a-form-item label="分类2">
+        <a-input v-model:value="ebook.category2Id" />
       </a-form-item>
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" type="textarea" />
@@ -78,8 +81,12 @@ export default defineComponent({
         dataIndex: 'name'
       },
       {
-        title: '分类',
-        dataIndex: 'category'
+        title: '分类1',
+        dataIndex: 'category1Id'
+      },
+      {
+        title: '分类2',
+        dataIndex: 'category2Id'
       },
       {
         title: '文档数',
@@ -132,6 +139,30 @@ export default defineComponent({
       });
     };
 
+    const ebook = ref({});
+    const modalVisible = ref(false);
+    const modalLoading = ref(false);
+    const handleModalOk = () => {
+      modalLoading.value = true;
+      axios.post("/ebook/save", ebook.value).then((response) => {
+        const data = response.data;
+        if(data.success){
+          modalVisible.value = false;
+          modalLoading.value = false;
+
+          handleQuery({
+            page:pagination.value.current,
+            size:pagination.value.pageSize
+          });
+        }
+      });
+    };
+
+    const edit = (record:any) => {
+      modalVisible.value = true;
+      ebook.value = record
+    };
+
     onMounted(() =>{
       handleQuery({
         page:1,
@@ -139,21 +170,7 @@ export default defineComponent({
       });
     });
 
-    const ebook = ref({});
-    console.log(ebook.value);
-    const modalVisible = ref(false);
-    const modalLoading = ref(false);
-    const handleModalOk = () => {
-      modalLoading.value = true;
-      setTimeout(() => {
-        modalVisible.value = false;
-        modalLoading.value = false;
-      }, 2000);
-    };
-    const edit = (record:any) => {
-      modalVisible.value = true;
-      ebook.value = record
-    };
+
 
     return {
       edit,

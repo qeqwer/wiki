@@ -75,7 +75,7 @@
 import {defineComponent, onMounted, ref, reactive, toRef} from 'vue';
 import axios from "axios";
 
-const listData: any = [];
+// const listData: any = [];
 
 // for (let i = 0; i < 23; i++) {
 //   listData.push({
@@ -99,7 +99,7 @@ export default defineComponent({
     onMounted(()=>{
       axios.get("/ebook/list",{
         params:{
-          pages:1,
+          page:1,
           size:1000
         }
       }).then((response) => {
