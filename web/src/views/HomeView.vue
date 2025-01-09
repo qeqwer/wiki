@@ -23,7 +23,12 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list item-layout="vertical" size="large" :grid="{gutter:20, column:3}" :data-source="ebooks">
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>
+          欢迎使用知识库
+        </h1>
+      </div>
+      <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{gutter:20, column:3}" :data-source="ebooks">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
@@ -51,7 +56,6 @@ import {defineComponent, onMounted, ref, reactive, toRef} from 'vue';
 import axios from "axios";
 import {message} from "ant-design-vue";
 import { Tool } from '@/util/tool';
-import { MailOutlined } from '@ant-design/icons';
 
 
 // const listData: any = [];
@@ -76,6 +80,26 @@ export default defineComponent({
 
     const level1 =  ref();
     let categorys: any;
+
+    const isShowWelcome = ref(true);
+    let categoryId2 = 0;
+
+    /**
+     * 根据二级分类查询
+     **/
+    const handleQueryEbook = () => {
+      axios.get("/ebook/list", {
+        params: {
+          page: 1,
+          size: 1000,
+          categoryId2: categoryId2
+        }
+      }).then((response) => {
+        const data = response.data;
+        ebooks.value = data.content.list;
+      });
+    };
+
     /**
      * 查询所有分类
      **/
@@ -101,29 +125,32 @@ export default defineComponent({
       });
     };
 
+    /**
+     * 点击事件
+     **/
     const handleClick = (value: any) => {
       console.log("menu click", value)
+      if (value.key === 'welcome') {
+        isShowWelcome.value = true;
+      } else {
+        categoryId2 = value.key;
+        isShowWelcome.value = false;
+        handleQueryEbook();
       }
+    };
 
 
       onMounted(()=>{
-      handleQueryCategory();
-      axios.get("/ebook/list",{
-        params:{
-          page:1,
-          size:1000
-        }
-      }).then((response) => {
-        const data = response.data;
-        ebooks.value = data.content.list;
-        // ebooks1.books=data.content;
+        handleQueryCategory();
+        // handleQueryEbook();
       });
-    });
+
 
     return {
       ebooks,
       handleClick,
       level1,
+      isShowWelcome,
       // ebooks2:toRef(ebooks1,'books'),
       // listData,
       pagination : {
