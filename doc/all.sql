@@ -47,6 +47,7 @@ insert into `category`(id, parent, name, sort) values (501, 500, '服务器', 50
 insert into `category`(id, parent, name, sort) values (502, 500, '开发工具', 502);
 insert into `category`(id, parent, name, sort) values (503, 500, '热门服务端语言', 503);
 
+# 文档
 drop table if exists `doc`;
 create table `doc`(
                     `id` bigint not null comment 'id',
@@ -65,6 +66,15 @@ insert into `doc`(id, ebook_id, parent, name, sort, view_count,vote_count) value
 insert into `doc`(id, ebook_id, parent, name, sort, view_count,vote_count) values (4, 1, 3, '文档2.1', 1, 0, 0);
 insert into `doc`(id, ebook_id, parent, name, sort, view_count,vote_count) values (5, 1, 3, '文档2.2', 2, 0, 0);
 insert into `doc`(id, ebook_id, parent, name, sort, view_count,vote_count) values (6, 1, 5, '文档2.2.1', 1, 0, 0);
+
+# 文档内容
+drop table if exists `content`;
+create table `content`(
+                      `id` bigint not null comment '文档id',
+                      `content` mediumtext not null  comment '内容',
+                      primary key (`id`)
+) engine=innodb default charset=utf8mb4 comment='文档内容';
+
 
 
 
