@@ -97,14 +97,6 @@
     </a-layout-content>
   </a-layout>
 
-<!--  <a-modal-->
-<!--      title="文档表单"-->
-<!--      v-model:open="modalVisible"-->
-<!--      :confirm-loading="modalLoading"-->
-<!--      @ok="handleModalOk"-->
-<!--  >-->
-<!--  </a-modal>-->
-
 </template>
 
 <script lang="ts">
@@ -166,6 +158,17 @@ export default defineComponent({
       }
     ];
 
+    const treeSelectData = ref();
+    treeSelectData.value = [];
+    const doc = ref();
+    doc.value = {};
+
+    const modalLoading = ref(false);
+
+    const editor = new E("#content");
+    editor.i18next = i18next;
+    editor.config.zIndex=0;
+
     /**
      * 数据查询
      **/
@@ -182,6 +185,21 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
           console.log("树形结构：", level1);
+        }
+        else{
+          message.error(data.message);
+        }
+      });
+    };
+
+    /**
+     * 内容查询
+     **/
+    const handleQueryContent = () => {
+      axios.get("/doc/find-content/" + doc.value.id).then((response) => {
+        const data = response.data;
+        if(data.success){
+          editor.txt.html(data.content);
         }
         else{
           message.error(data.message);
@@ -253,23 +271,9 @@ export default defineComponent({
       }
     };
 
-
     /**
-     * 表单
+     * 保存
      */
-    const treeSelectData = ref();
-    treeSelectData.value = [];
-    const doc = ref();
-    doc.value = {};
-
-    const modalVisible = ref(false);
-    const modalLoading = ref(false);
-
-    const editor = new E("#content");
-    editor.i18next = i18next;
-    editor.config.zIndex=0;
-
-
     const handleSave = () => {
       modalLoading.value = true;
       doc.value.content = editor.txt.html();
@@ -277,7 +281,8 @@ export default defineComponent({
         const data = response.data;
         modalLoading.value = false;
         if(data.success){
-          modalVisible.value = false;
+          message.success("保存成功！")
+          //重新加载资源
           handleQuery();
         }
         else{
@@ -287,30 +292,23 @@ export default defineComponent({
     };
 
     const edit = (record:any) => {
-      modalVisible.value = true;
+      // 清空富文本框
+      editor.txt.html("");
       doc.value = Tool.copy(record);
+      handleQueryContent();
 
       // 不能选择当前节点及其所有子孙节点，作为父节点，会使树断开
       treeSelectData.value = Tool.copy(level1.value);
       setDisable(treeSelectData.value, record.id);
 
+
       // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
-
-      // if (editorRef.value) {
-      //   editorRef.value.destroy();
-      //   editorRef.value = null;
-      // }
-
-    //   setTimeout(function (){
-    //
-    //     editor.create();
-    //     editorRef.value = editor;
-    //   },100);
     };
 
     const add = () =>{
-      modalVisible.value = true;
+      // 清空富文本框
+      editor.txt.html("");
       doc.value = {ebookId: route.query.ebookId};
 
       treeSelectData.value = Tool.copy(level1.value);
@@ -353,7 +351,6 @@ export default defineComponent({
       handelDelete,
       treeSelectData,
 
-      modalVisible,
       modalLoading,
       handleSave,
 
