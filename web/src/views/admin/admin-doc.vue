@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-import {createVNode, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue';
+import {createVNode, defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import {message, Modal} from "ant-design-vue";
 import {Tool} from "@/util/tool";
@@ -175,7 +175,7 @@ export default defineComponent({
     const handleQuery = () => {
       loading.value = true;
       level1.value = [];
-      axios.get("/doc/all").then((response) => {
+      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
         loading.value = false
         const data = response.data;
         if(data.success){
@@ -185,6 +185,11 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
           console.log("树形结构：", level1);
+
+          //父文档下拉框初始化，相当于点击新增
+          treeSelectData.value = Tool.copy(level1.value);
+          // 为选择树添加一个"无"
+          treeSelectData.value.unshift({id: 0, name: '无'});
         }
         else{
           message.error(data.message);
@@ -276,10 +281,11 @@ export default defineComponent({
      */
     const handleSave = () => {
       modalLoading.value = true;
+      doc.value.ebookId = route.query.ebookId;
       doc.value.content = editor.txt.html();
       axios.post("/doc/save", doc.value).then((response) => {
-        const data = response.data;
         modalLoading.value = false;
+        const data = response.data;
         if(data.success){
           message.success("保存成功！")
           //重新加载资源
@@ -309,7 +315,7 @@ export default defineComponent({
     const add = () =>{
       // 清空富文本框
       editor.txt.html("");
-      doc.value = {ebookId: route.query.ebookId};
+      // doc.value = {ebookId: route.query.ebookId};
 
       treeSelectData.value = Tool.copy(level1.value);
 
