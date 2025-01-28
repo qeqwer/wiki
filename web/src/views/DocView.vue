@@ -1,8 +1,7 @@
 <template>
   <a-layout>
-    <a-layout-content
-        :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
-    >
+    <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
+      <h3 v-if="level1.length === 0">对不起，找不到相关文档！</h3>
       <a-row>
         <a-col :span="6">
           <a-tree
@@ -11,6 +10,7 @@
               @select="onSelect"
               :fieldNames="{title: 'name', key: 'id', value: 'id'}"
               :default-expand-all="true"
+              :defaultSelectedKeys="defaultSelectedKeys"
           >
           </a-tree>
         </a-col>
@@ -35,9 +35,12 @@ export default defineComponent({
     const route = useRoute();
     const docs = ref();
     const html = ref();
+    const defaultSelectedKeys = ref();
+    defaultSelectedKeys.value = [];
 
     // 当前选中的文档
     // const doc = ref();
+    // doc.value = {};
 
     /**
      * 一级文档树，children属性就是二级文档
@@ -54,24 +57,6 @@ export default defineComponent({
     level1.value = [];
 
     /**
-     * 数据查询
-     **/
-    const handleQuery = () => {
-      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
-        const data = response.data;
-        if(data.success){
-          docs.value = data.content;
-
-          level1.value = [];
-          level1.value = Tool.array2Tree(docs.value, 0);
-        }
-        else{
-          message.error(data.message);
-        }
-      });
-    };
-
-    /**
      * 内容查询
      **/
     const handleQueryContent = (id: number) => {
@@ -84,6 +69,35 @@ export default defineComponent({
         }
       });
     };
+
+    /**
+     * 数据查询
+     **/
+    const handleQuery = () => {
+      axios.get("/doc/all/" + route.query.ebookId).then((response) => {
+        const data = response.data;
+        if(data.success){
+          docs.value = data.content;
+
+          level1.value = [];
+          level1.value = Tool.array2Tree(docs.value, 0);
+
+          if(Tool.isNotEmpty(level1) && level1.value.length > 0){
+            //只是选中
+            defaultSelectedKeys.value = [level1.value[0].id];
+            //查询显示
+            handleQueryContent(level1.value[0].id);
+            // // 初始显示文档信息
+            // doc.value = level1.value[0];
+          }
+        }
+        else {
+          message.error(data.message);
+        }
+      });
+    };
+
+
 
     const onSelect = (selectedKeys: any, info: any) => {
       console.log('selected', selectedKeys, info);
@@ -103,6 +117,7 @@ export default defineComponent({
       level1,
       html,
       onSelect,
+      defaultSelectedKeys,
     }
   }
 });
