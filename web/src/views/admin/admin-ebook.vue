@@ -53,7 +53,7 @@
                   title="删除后不可恢复，确认删除?"
                   ok-text="是"
                   cancel-text="否"
-                  @confirm="handelDelete(record.id)"
+                  @confirm="handleDelete(record.id)"
               >
                 <a-button type="primary" danger >
                   删除
@@ -226,7 +226,7 @@ export default defineComponent({
       ebook.value = {};
     };
 
-    const handelDelete = (id: number) =>{
+    const handleDelete = (id: number) =>{
       axios.delete("/ebook/delete/" + id).then((response) => {
         const data = response.data;
         if(data.success){
@@ -290,7 +290,7 @@ export default defineComponent({
     return {
       edit,
       add,
-      handelDelete,
+      handleDelete,
 
       modalVisible,
       modalLoading,
