@@ -2,6 +2,7 @@ package com.niko.wiki.controller;
 
 
 import com.niko.wiki.req.UserQueryReq;
+import com.niko.wiki.req.UserResetPasswordReq;
 import com.niko.wiki.req.UserSaveReq;
 import com.niko.wiki.resp.CommonResp;
 import com.niko.wiki.resp.UserQueryResp;
@@ -40,6 +41,14 @@ public class UserController {
     public CommonResp delete(@PathVariable Long id) {
         CommonResp resp = new CommonResp<>();
         userService.delete(id);
+        return resp;
+    }
+
+    @PostMapping("/reset-password")
+    public CommonResp resetPassword(@Valid @RequestBody UserResetPasswordReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp resp = new CommonResp<>();
+        userService.resetPassword(req);
         return resp;
     }
 

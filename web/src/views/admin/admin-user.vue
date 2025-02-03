@@ -32,7 +32,7 @@
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'action'">
             <a-space size="small">
-              <a-button type="primary">
+              <a-button type="primary" @click="resetPassword(record)">
                 重置密码
               </a-button>
               <a-button type="primary" @click="edit(record)">
@@ -93,7 +93,6 @@ import { defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
-
 
 declare let hexMd5: any;
 declare let KEY: any;
@@ -221,6 +220,40 @@ export default defineComponent({
       });
     };
 
+    /****重置密码****/
+    const resetModalVisible = ref(false);
+    const resetModalLoading = ref(false);
+    const handleResetModalOk = () => {
+      resetModalLoading.value = true;
+
+      user.value.password = hexMd5(user.value.password + KEY);
+
+      axios.post("/user/reset-password", user.value).then((response) => {
+        const data = response.data;
+        resetModalLoading.value = false;
+        if(data.success){
+          resetModalVisible.value = false;
+
+          handleQuery({
+            page:pagination.value.current,
+            size:pagination.value.pageSize
+          });
+        }
+        else{
+          message.error(data.message)
+        }
+      });
+    };
+
+    /**
+     * 重置密码
+     */
+    const resetPassword = (record: any) => {
+      resetModalVisible.value = true;
+      user.value = Tool.copy(record);
+      user.value.password = null;
+    };
+
 
     onMounted(() =>{
       handleQuery({
@@ -238,6 +271,11 @@ export default defineComponent({
       modalVisible,
       modalLoading,
       handleModalOk,
+
+      resetModalVisible,
+      resetModalLoading,
+      handleResetModalOk,
+      resetPassword,
 
 
       param,

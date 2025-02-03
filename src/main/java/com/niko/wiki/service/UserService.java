@@ -8,6 +8,7 @@ import com.niko.wiki.exception.BusinessException;
 import com.niko.wiki.exception.BusinessExceptionCode;
 import com.niko.wiki.mapper.UserMapper;
 import com.niko.wiki.req.UserQueryReq;
+import com.niko.wiki.req.UserResetPasswordReq;
 import com.niko.wiki.req.UserSaveReq;
 import com.niko.wiki.resp.UserQueryResp;
 import com.niko.wiki.resp.PageResp;
@@ -101,5 +102,10 @@ public class UserService {
      */
     public void delete(Long id) {
         userMapper.deleteByPrimaryKey(id);
+    }
+
+    public void resetPassword(UserResetPasswordReq req) {
+        User user = CopyUtil.copy(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }
