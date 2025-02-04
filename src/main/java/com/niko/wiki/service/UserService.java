@@ -7,9 +7,11 @@ import com.niko.wiki.domain.UserExample;
 import com.niko.wiki.exception.BusinessException;
 import com.niko.wiki.exception.BusinessExceptionCode;
 import com.niko.wiki.mapper.UserMapper;
+import com.niko.wiki.req.UserLoginReq;
 import com.niko.wiki.req.UserQueryReq;
 import com.niko.wiki.req.UserResetPasswordReq;
 import com.niko.wiki.req.UserSaveReq;
+import com.niko.wiki.resp.UserLoginResp;
 import com.niko.wiki.resp.UserQueryResp;
 import com.niko.wiki.resp.PageResp;
 import com.niko.wiki.utils.CopyUtil;
@@ -78,17 +80,17 @@ public class UserService {
                 throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
             }
         } else {
-            user.setName(null);
+            user.setLoginName(null);
             user.setPassword(null);
             // 更新
-            userMapper.updateByPrimaryKey(user);
+            userMapper.updateByPrimaryKeySelective(user);
         }
     }
 
-    public User selectByLoginName(String loginName){
+    public User selectByLoginName(String LoginName){
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
-        criteria.andNameLike( loginName);
+        criteria.andLoginNameEqualTo(LoginName);
         List<User> userList = userMapper.selectByExample(userExample);
         if(CollectionUtils.isEmpty(userList)){
             return null;
@@ -104,8 +106,30 @@ public class UserService {
         userMapper.deleteByPrimaryKey(id);
     }
 
+    /**
+     * 重置密码
+     */
     public void resetPassword(UserResetPasswordReq req) {
         User user = CopyUtil.copy(req, User.class);
         userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    public UserLoginResp login(UserLoginReq req) {
+        User userDb = selectByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(userDb)) {
+            // 用户名不存在
+            LOG.info("用户名不存在, {}", req.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            } else {
+               if(userDb.getPassword().equals(req.getPassword())){
+                   // 登录成功
+                    UserLoginResp userLoginResp = CopyUtil.copy(userDb, UserLoginResp.class);
+                    return userLoginResp;
+            } else {
+                   // 密码不对
+                   LOG.info("密码不对, 输入密码：{}, 数据库密码：{}", req.getPassword(), userDb.getPassword());
+                   throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
+        }
     }
 }

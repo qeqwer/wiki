@@ -1,10 +1,12 @@
 package com.niko.wiki.controller;
 
 
+import com.niko.wiki.req.UserLoginReq;
 import com.niko.wiki.req.UserQueryReq;
 import com.niko.wiki.req.UserResetPasswordReq;
 import com.niko.wiki.req.UserSaveReq;
 import com.niko.wiki.resp.CommonResp;
+import com.niko.wiki.resp.UserLoginResp;
 import com.niko.wiki.resp.UserQueryResp;
 import com.niko.wiki.resp.PageResp;
 import com.niko.wiki.service.UserService;
@@ -49,6 +51,15 @@ public class UserController {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         CommonResp resp = new CommonResp<>();
         userService.resetPassword(req);
+        return resp;
+    }
+
+    @PostMapping("/login")
+    public CommonResp login(@Valid @RequestBody UserLoginReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp<UserLoginResp> resp = new CommonResp<>();
+        UserLoginResp userLoginResp =  userService.login(req);
+        resp.setContent(userLoginResp);
         return resp;
     }
 
