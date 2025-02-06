@@ -86,6 +86,7 @@
             loginModalVisible.value = false;
             message.success("登录成功！");
             user.value = data.content;
+            store.commit("setUser",user.value);
           } else{
             message.error(data.message);
           }
