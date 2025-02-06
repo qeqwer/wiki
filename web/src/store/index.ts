@@ -1,8 +1,11 @@
 import { createStore } from 'vuex'
 
- const store = createStore({
+declare let SessionStorage: any;
+const USER = "USER";
+
+const store = createStore({
   state: {
-    user:{}
+    user:SessionStorage.get(USER) || {}
   },
   getters: {
   },
@@ -10,6 +13,7 @@ import { createStore } from 'vuex'
     setUser(state,user){
       console.log("store user: ", user);
       state.user = user;
+      SessionStorage.set(USER,user);
     }
   },
   actions: {
