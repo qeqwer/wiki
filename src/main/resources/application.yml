@@ -1,25 +1,26 @@
-server:
-  port: 8880
+#server:
+#  port: 8880
+#
+#test:
+#  hello: Hello3
+#
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/wikidev?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+#    username: root
+#    password: 7355608
+#
+#
+#
+#mybatis:
+#  mapper-locations: classpath:/mapper/**/*.xml
+#
+#
+#logging:
+#  level:
+#    com:
+#      niko:
+#        wiki:
+#          mapper: trace
 
-test:
-  hello: Hello3
-
-spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/wikidev?characterEncoding=UTF8&autoReconnect=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
-    username: root
-    password: 7355608
-
-
-
-mybatis:
-  mapper-locations: classpath:/mapper/**/*.xml
-
-
-logging:
-  level:
-    com:
-      niko:
-        wiki:
-          mapper: trace
