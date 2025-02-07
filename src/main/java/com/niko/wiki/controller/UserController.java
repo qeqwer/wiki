@@ -18,6 +18,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/user")
@@ -78,6 +79,20 @@ public class UserController {
                 JSONObject.toJSONString(userLoginResp), 3600 * 24, TimeUnit.SECONDS);
 
         resp.setContent(userLoginResp);
+        return resp;
+    }
+
+    @PostMapping("/logout")
+    public CommonResp logout(@RequestBody Map<String, String> requestBody) {
+        CommonResp resp = new CommonResp<>();
+        String token = requestBody.get("token");
+        if (token != null) {
+            redisTemplate.delete(token);
+            LOG.info("从redis中删除: {}", token);
+        } else {
+            resp.setSuccess(false);
+            resp.setMessage("Token 不能为空");
+        }
         return resp;
     }
 
