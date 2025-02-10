@@ -5,19 +5,26 @@ import com.github.pagehelper.PageInfo;
 import com.niko.wiki.domain.Content;
 import com.niko.wiki.domain.Doc;
 import com.niko.wiki.domain.DocExample;
+import com.niko.wiki.exception.BusinessException;
+import com.niko.wiki.exception.BusinessExceptionCode;
 import com.niko.wiki.mapper.ContentMapper;
 import com.niko.wiki.mapper.DocMapper;
 import com.niko.wiki.mapper.DocMapperCust;
 import com.niko.wiki.req.DocQueryReq;
 import com.niko.wiki.req.DocSaveReq;
+import com.niko.wiki.resp.CommonResp;
 import com.niko.wiki.resp.DocQueryResp;
 import com.niko.wiki.resp.PageResp;
 import com.niko.wiki.utils.CopyUtil;
+import com.niko.wiki.utils.RedisUtil;
+import com.niko.wiki.utils.RequestContext;
 import com.niko.wiki.utils.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -36,6 +43,9 @@ public class DocService {
 
     @Resource
     private ContentMapper contentMapper;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Resource
     private SnowFlake snowFlake;
@@ -127,5 +137,17 @@ public class DocService {
         }
     }
 
-
+    /**
+     * 点赞
+     */
+    public void vote(Long id) {
+        // docMapperCust.increaseVoteCount(id);
+        // 远程IP+doc.id作为key，24小时内不能重复
+        String ip = RequestContext.getRemoteAddr();
+        if (redisUtil.validateRepeat("DOC_VOTE_" + id + "_" + ip, 5000)) {
+            docMapperCust.increaseVoteCount(id);
+        } else {
+            throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
+        }
+    }
 }
