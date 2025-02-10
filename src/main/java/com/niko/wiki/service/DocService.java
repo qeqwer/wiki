@@ -7,6 +7,7 @@ import com.niko.wiki.domain.Doc;
 import com.niko.wiki.domain.DocExample;
 import com.niko.wiki.mapper.ContentMapper;
 import com.niko.wiki.mapper.DocMapper;
+import com.niko.wiki.mapper.DocMapperCust;
 import com.niko.wiki.req.DocQueryReq;
 import com.niko.wiki.req.DocSaveReq;
 import com.niko.wiki.resp.DocQueryResp;
@@ -29,6 +30,10 @@ public class DocService {
 
     @Resource
     private DocMapper docMapper;
+
+    @Resource
+    private DocMapperCust docMapperCust;
+
     @Resource
     private ContentMapper contentMapper;
 
@@ -81,6 +86,8 @@ public class DocService {
         if (ObjectUtils.isEmpty(req.getId())) {
             // 新增
             doc.setId(snowFlake.nextId());
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
 
             content.setId(doc.getId());
@@ -101,18 +108,24 @@ public class DocService {
     public void delete(Long id) {
         docMapper.deleteByPrimaryKey(id);
     }
+
     public void delete(List<String> ids) {
         DocExample docExample = new DocExample();
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andIdIn(ids);
         docMapper.deleteByExample(docExample);
     }
+
     public String findContent(Long id) {
         Content content = contentMapper.selectByPrimaryKey(id);
+        // 文档阅读数+1
+        docMapperCust.increaseViewCount(id);
         if (ObjectUtils.isEmpty(content)) {
             return "";
         } else {
             return content.getContent();
         }
     }
+
+
 }
