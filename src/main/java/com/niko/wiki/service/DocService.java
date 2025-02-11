@@ -19,8 +19,10 @@ import com.niko.wiki.utils.CopyUtil;
 import com.niko.wiki.utils.RedisUtil;
 import com.niko.wiki.utils.RequestContext;
 import com.niko.wiki.utils.SnowFlake;
+import com.niko.wiki.websocket.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +48,9 @@ public class DocService {
 
     @Resource
     private RedisUtil redisUtil;
+
+    @Resource
+    public WebSocketServer webSocketServer;
 
     @Resource
     private SnowFlake snowFlake;
@@ -149,6 +154,11 @@ public class DocService {
         } else {
             throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
         }
+
+        //推送消息
+        Doc docDb = docMapper.selectByPrimaryKey(id);
+//        String logId = MDC.get("LOG_ID");
+        webSocketServer.sendInfo("【" + docDb.getName() + "】被点赞！");
     }
 
     public void updateEbookInfo() {
