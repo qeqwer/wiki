@@ -205,11 +205,11 @@ export default defineComponent({
     font-weight:600;
   }
 
-  /*!* 点赞 *!*/
-  /*.vote-div {*/
-  /*  padding: 15px;*/
-  /*  text-align: center;*/
-  /*}*/
+  /* 点赞 */
+  .vote-div {
+    padding: 15px;
+    text-align: center;
+  }
 
   /* 图片自适应 */
   .wangeditor img {
